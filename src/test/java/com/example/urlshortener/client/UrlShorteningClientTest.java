@@ -10,6 +10,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -55,7 +56,8 @@ class UrlShorteningClientTest {
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(mockResponse, result.getBody());
 
-        ArgumentCaptor<HttpEntity<Map<String, String>>> entityCaptor = ArgumentCaptor.forClass((Class) HttpEntity.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<HttpEntity<Map<String, String>>> entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
         verify(restTemplate).exchange(
                 eq(expectedApiUrl),
                 eq(HttpMethod.POST),
@@ -70,7 +72,7 @@ class UrlShorteningClientTest {
     }
 
     @Test
-    void shortenUrlHandlesRestTemplateException() {
+    void shortenUrlThrowsUrlShorteningClientExceptionOnRestClientException() {
         String url = "http://example.com";
         String expectedApiUrl = "http://test-domain.com/api/v1/link?api_key=test-api-key";
 
@@ -79,9 +81,14 @@ class UrlShorteningClientTest {
                 eq(HttpMethod.POST),
                 any(HttpEntity.class),
                 eq(LinkResponse.class)
-        )).thenThrow(new RuntimeException("API error"));
+        )).thenThrow(new RestClientException("API error"));
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> client.shortenUrl(url));
-        assertEquals("API error", ex.getMessage());
+        Exception ex = assertThrows(
+                com.example.urlshortener.exception.UrlShorteningClientException.class,
+                () -> client.shortenUrl(url)
+        );
+        assertTrue(ex.getMessage().contains("Failed to call external URL shortening service"));
+        assertInstanceOf(RestClientException.class, ex.getCause());
     }
+
 }
