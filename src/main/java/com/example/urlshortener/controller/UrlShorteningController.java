@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping(("/api/v1"))
 public class UrlShorteningController {
 
     private static final Logger log = LoggerFactory.getLogger(UrlShorteningController.class);
@@ -21,7 +22,7 @@ public class UrlShorteningController {
         this.service = service;
     }
 
-    @PostMapping("/api/v1/shorten")
+    @PostMapping("/shorten")
     public ResponseEntity<ShortenResponse> createShortUrl(@Valid @RequestBody ShortenRequest request) {
 
         log.info("Received request to shorten URL: {}", request.getUrl());
@@ -31,7 +32,7 @@ public class UrlShorteningController {
         return ResponseEntity.ok(new ShortenResponse(mapping.getCode(), mapping.getShortUrl()));
     }
 
-    @GetMapping("/api/v1/resolve/{code}")
+    @GetMapping("/resolve/{code}")
     public ResponseEntity<String> resolve(@NotNull @PathVariable("code") Long code) {
         log.info("Received request to resolve code: {}", code);
         return service.resolveByCode(code)
