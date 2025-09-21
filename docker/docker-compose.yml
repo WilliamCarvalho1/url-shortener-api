@@ -1,17 +1,9 @@
-version: '3.8'
 services:
-  app:
-    build: .
-    ports:
-      - "8080:8080"
+  postgres:
+    image: 'postgres:latest'
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-  # Uncomment and configure for production
-  # db:
-  #   image: postgres:15
-  #   environment:
-  #     POSTGRES_DB: url_shortener
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: password
-  # redis:
-  #   image: redis:7
+      - 'POSTGRES_DB=url_shortener'
+      - 'POSTGRES_PASSWORD=password'
+      - 'POSTGRES_USER=admin'
+    ports:
+      - '5432:5432'

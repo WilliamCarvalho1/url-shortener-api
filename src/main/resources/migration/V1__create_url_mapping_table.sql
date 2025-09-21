@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS url_mapping (
+  id BIGSERIAL PRIMARY KEY,
+  code BIGINT NOT NULL UNIQUE,
+  original_url VARCHAR(2048) NOT NULL,
+  short_url VARCHAR(255) NOT NULL UNIQUE
+);
+CREATE INDEX IF NOT EXISTS idx_code ON url_mapping (code);
