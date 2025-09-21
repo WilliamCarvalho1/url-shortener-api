@@ -2,6 +2,7 @@ package com.example.urlshortener.controller;
 
 import com.example.urlshortener.api.ShortenRequest;
 import com.example.urlshortener.api.ShortenResponse;
+import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.UrlShorteningService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,13 +11,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UrlShorteningControllerTest {
+
+    private static final String ORIGINAL_URL = "http://example.com";
+    public static final String SHORT_URL = "http://short.url/123";
+    private static final Long CODE = 123L;
 
     @InjectMocks
     private UrlShorteningController controller;
@@ -26,17 +30,44 @@ class UrlShorteningControllerTest {
 
     @Test
     void createShortUrlUrlSuccess() {
-        ShortenResponse mockResponse = new ShortenResponse(123L, "http://short.url/123");
+        ShortenResponse mockResponse = new ShortenResponse(CODE, SHORT_URL);
         when(service.createShortUrl(anyString()))
                 .thenReturn(mockResponse);
 
-        ShortenRequest request = new ShortenRequest("http://example.com");
+        ShortenRequest request = new ShortenRequest(ORIGINAL_URL);
 
         ResponseEntity<ShortenResponse> response = controller.createShortUrl(request);
 
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
-        assertEquals(123L, response.getBody().getCode());
-        assertEquals("http://short.url/123", response.getBody().getShortUrl());
+        assertEquals(CODE, response.getBody().getCode());
+        assertEquals(SHORT_URL, response.getBody().getShortUrl());
     }
+
+    @Test
+    void resolveSuccess() {
+        when(service.resolveByCode(CODE))
+                .thenReturn(java.util.Optional.of(UrlMapping.builder()
+                        .code(CODE)
+                        .originalUrl(ORIGINAL_URL)
+                        .shortUrl(SHORT_URL)
+                        .build())
+                );
+
+        ResponseEntity<String> response = controller.resolve(CODE);
+
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(ORIGINAL_URL, response.getBody());
+    }
+
+    @Test
+    void resolveNotFound() {
+        when(service.resolveByCode(CODE)).thenReturn(java.util.Optional.empty());
+
+        ResponseEntity<String> response = controller.resolve(CODE);
+
+        assertEquals(404, response.getStatusCode().value());
+        assertNull(response.getBody());
+    }
+
 }

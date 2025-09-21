@@ -96,4 +96,33 @@ class UrlShorteningServiceTest {
         verify(repository, never()).save(any());
         verify(client, never()).shortenUrl(anyString());
     }
+
+    @Test
+    void resolveByCodeSuccess() {
+        UrlMapping mapping = UrlMapping.builder()
+                .code(CODE)
+                .shortUrl(SHORT_URL)
+                .originalUrl(ORIGINAL_URL)
+                .build();
+        when(repository.findByCode(CODE))
+                .thenReturn(Optional.of(mapping));
+
+        Optional<UrlMapping> result = service.resolveByCode(CODE);
+
+        assertTrue(result.isPresent());
+        assertEquals(CODE, result.get().getCode());
+        assertEquals(SHORT_URL, result.get().getShortUrl());
+        assertEquals(ORIGINAL_URL, result.get().getOriginalUrl());
+    }
+
+    @Test
+    void resolveByCodeNotFound() {
+        when(repository.findByCode(CODE))
+                .thenReturn(Optional.empty());
+
+        Optional<UrlMapping> result = service.resolveByCode(CODE);
+
+        assertFalse(result.isPresent());
+    }
+
 }

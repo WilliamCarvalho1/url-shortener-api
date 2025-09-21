@@ -64,4 +64,10 @@ public class UrlShorteningService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
+    public Optional<UrlMapping> resolveByCode(Long code) {
+
+        return repository.findByCode(code);
+    }
+
 }
