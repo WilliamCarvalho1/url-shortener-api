@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class UrlMappingRepositoryAdapter implements UrlMappingRepository {
+public class UrlMappingRepositoryAdapter implements UrlMappingRepositoryPort {
 
     private final JpaUrlMappingRepository jpaRepository;
 

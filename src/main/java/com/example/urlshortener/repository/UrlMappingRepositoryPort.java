@@ -4,7 +4,7 @@ import com.example.urlshortener.model.UrlMapping;
 
 import java.util.Optional;
 
-public interface UrlMappingRepository {
+public interface UrlMappingRepositoryPort {
     void save(UrlMapping mapping);
 
     Optional<UrlMapping> findByCode(Long code);

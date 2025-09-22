@@ -14,14 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class UrlUrlShorteningClientImpl implements UrlShorteningClient {
+public class UrlShorteningClientImpl implements UrlShorteningClient {
     private final String apiKey;
     private final String domain;
     private final String workspaceId;
     private final RestTemplate restTemplate;
 
     @Autowired
-    public UrlUrlShorteningClientImpl(
+    public UrlShorteningClientImpl(
             @Value("${url-shortener.apiKey}") String apiKey,
             @Value("${url-shortener.domain}") String domain,
             @Value("${url-shortener.workspaceId}") String workspaceId,
@@ -33,6 +33,7 @@ public class UrlUrlShorteningClientImpl implements UrlShorteningClient {
         this.restTemplate = restTemplate;
     }
 
+    @Override
     public ResponseEntity<LinkResponse> shortenUrl(String url) {
         String apiUrl = domain + "/api/v1/link?api_key=" + apiKey;
 

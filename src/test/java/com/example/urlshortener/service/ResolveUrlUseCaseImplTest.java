@@ -2,8 +2,8 @@ package com.example.urlshortener.service;
 
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
-import com.example.urlshortener.repository.UrlMappingRepository;
-import com.example.urlshortener.service.cache.CacheService;
+import com.example.urlshortener.service.cache.UrlMappingCachePort;
+import com.example.urlshortener.service.db.UrlMappingFinder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 
-import java.time.Duration;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,36 +25,41 @@ class ResolveUrlUseCaseImplTest {
     private static final Long CODE = 123L;
 
     @Mock
-    private UrlMappingRepository repository;
+    private UrlMappingFinder finder;
 
     @Mock
-    private CacheService cacheService;
+    UrlMappingCachePort cachePort;
 
     @InjectMocks
     private ResolveUrlUseCaseImpl resolveUrlUseCase;
 
     @BeforeEach
     void setUp() {
-        resolveUrlUseCase = new ResolveUrlUseCaseImpl(repository, cacheService);
+        resolveUrlUseCase = new ResolveUrlUseCaseImpl(cachePort, finder);
     }
 
     @Test
     void resolveByCodeCachedResponse() {
-        when(cacheService.get(String.valueOf(CODE)))
-                .thenReturn(Optional.of(ORIGINAL_URL));
+        UrlMapping mapping = UrlMapping.builder()
+                .code(CODE)
+                .originalUrl(ORIGINAL_URL)
+                .shortUrl(SHORT_URL)
+                .build();
+
+        when(cachePort.get(CODE)).thenReturn(Optional.of(mapping));
 
         Optional<UrlMapping> result = resolveUrlUseCase.resolveByCode(CODE);
 
         assertTrue(result.isPresent());
         assertEquals(CODE, result.get().getCode());
         assertEquals(ORIGINAL_URL, result.get().getOriginalUrl());
-        verify(cacheService).get(String.valueOf(CODE));
-        verify(repository, never()).findByCode(anyLong());
+        verify(cachePort).get(CODE);
+        verify(finder, never()).findExistingMappingByCode(anyLong());
     }
 
     @Test
     void resolveByCodeDbResponse() {
-        when(cacheService.get(String.valueOf(CODE)))
+        when(cachePort.get(CODE))
                 .thenReturn(Optional.empty());
 
         UrlMapping mapping = UrlMapping.builder()
@@ -63,10 +67,10 @@ class ResolveUrlUseCaseImplTest {
                 .shortUrl(SHORT_URL)
                 .originalUrl(ORIGINAL_URL)
                 .build();
-        when(repository.findByCode(CODE))
+        when(finder.findExistingMappingByCode(CODE))
                 .thenReturn(Optional.of(mapping));
-        doNothing().when(cacheService)
-                .set(String.valueOf(CODE), ORIGINAL_URL, Duration.ofDays(30));
+        doNothing().when(cachePort)
+                .cache(mapping);
 
         Optional<UrlMapping> result = resolveUrlUseCase.resolveByCode(CODE);
 
@@ -74,31 +78,31 @@ class ResolveUrlUseCaseImplTest {
         assertEquals(CODE, result.get().getCode());
         assertEquals(SHORT_URL, result.get().getShortUrl());
         assertEquals(ORIGINAL_URL, result.get().getOriginalUrl());
-        verify(cacheService).get(String.valueOf(CODE));
-        verify(repository).findByCode(CODE);
-        verify(cacheService).set(String.valueOf(CODE), ORIGINAL_URL, Duration.ofDays(30));
+        verify(cachePort).get(CODE);
+        verify(finder).findExistingMappingByCode(CODE);
+        verify(cachePort).cache(mapping);
     }
 
     @Test
     void resolveByCodeNotFound() {
-        when(cacheService.get(String.valueOf(CODE)))
+        when(cachePort.get(CODE))
                 .thenReturn(Optional.empty());
-        when(repository.findByCode(CODE))
+        when(finder.findExistingMappingByCode(CODE))
                 .thenReturn(Optional.empty());
 
         Optional<UrlMapping> result = resolveUrlUseCase.resolveByCode(CODE);
 
         assertFalse(result.isPresent());
-        verify(cacheService).get(String.valueOf(CODE));
-        verify(repository).findByCode(CODE);
-        verify(cacheService, never()).set(anyString(), anyString(), any());
+        verify(cachePort).get(CODE);
+        verify(finder).findExistingMappingByCode(CODE);
+        verify(cachePort, never()).cache(any());
     }
 
     @Test
     void resolveByCodeThrowsUrlShorteningServiceException() {
-        when(cacheService.get(String.valueOf(CODE)))
+        when(cachePort.get(CODE))
                 .thenReturn(Optional.empty());
-        when(repository.findByCode(CODE))
+        when(finder.findExistingMappingByCode(CODE))
                 .thenThrow(new DataAccessException("DB error") {
                 });
 
@@ -107,7 +111,7 @@ class ResolveUrlUseCaseImplTest {
                 () -> resolveUrlUseCase.resolveByCode(CODE)
         );
         assertTrue(ex.getMessage().contains("Database error"));
-        verify(cacheService).get(String.valueOf(CODE));
-        verify(repository).findByCode(CODE);
+        verify(cachePort).get(CODE);
+        verify(finder).findExistingMappingByCode(CODE);
     }
 }

@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LinkResponse {
-    private Long id;
+    @JsonProperty("id")
+    private Long code;
     @JsonProperty("url")
     private String originalUrl;
     @JsonProperty("full_url")
