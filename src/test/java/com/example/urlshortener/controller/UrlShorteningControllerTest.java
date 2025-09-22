@@ -3,7 +3,8 @@ package com.example.urlshortener.controller;
 import com.example.urlshortener.api.ShortenRequest;
 import com.example.urlshortener.api.ShortenResponse;
 import com.example.urlshortener.model.UrlMapping;
-import com.example.urlshortener.service.UrlShorteningService;
+import com.example.urlshortener.service.CreateShortUrlUseCaseImpl;
+import com.example.urlshortener.service.ResolveUrlUseCaseImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,17 +27,19 @@ class UrlShorteningControllerTest {
     private UrlShorteningController controller;
 
     @Mock
-    private UrlShorteningService service;
+    private CreateShortUrlUseCaseImpl createShortUrlUseCase;
+    @Mock
+    private ResolveUrlUseCaseImpl resolveUrlUseCase;
 
     @Test
-    void createShortUrlUrlSuccess() {
+    void createSuccess() {
         ShortenResponse mockResponse = new ShortenResponse(CODE, SHORT_URL);
-        when(service.createShortUrl(anyString()))
+        when(createShortUrlUseCase.createShortUrl(anyString()))
                 .thenReturn(mockResponse);
 
         ShortenRequest request = new ShortenRequest(ORIGINAL_URL);
 
-        ResponseEntity<ShortenResponse> response = controller.createShortUrl(request);
+        ResponseEntity<ShortenResponse> response = controller.create(request);
 
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
@@ -46,7 +49,7 @@ class UrlShorteningControllerTest {
 
     @Test
     void resolveSuccess() {
-        when(service.resolveByCode(CODE))
+        when(resolveUrlUseCase.resolveByCode(CODE))
                 .thenReturn(java.util.Optional.of(UrlMapping.builder()
                         .code(CODE)
                         .originalUrl(ORIGINAL_URL)
@@ -62,7 +65,7 @@ class UrlShorteningControllerTest {
 
     @Test
     void resolveNotFound() {
-        when(service.resolveByCode(CODE)).thenReturn(java.util.Optional.empty());
+        when(resolveUrlUseCase.resolveByCode(CODE)).thenReturn(java.util.Optional.empty());
 
         ResponseEntity<String> response = controller.resolve(CODE);
 

@@ -5,43 +5,36 @@ import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.client.UrlShorteningClient;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
-import com.example.urlshortener.repository.UrlShorteningRepository;
+import com.example.urlshortener.repository.UrlMappingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
-@Service
-public class UrlShorteningService {
-    private static final Logger log = LoggerFactory.getLogger(UrlShorteningService.class);
+import static com.example.urlshortener.util.UrlValidator.validateUrl;
 
-    private final UrlShorteningRepository repository;
+@Service
+public class CreateShortUrlUseCaseImpl implements CreateShortUrlUseCase {
+    private static final Logger log = LoggerFactory.getLogger(CreateShortUrlUseCaseImpl.class);
+
+    private final UrlMappingRepository repository;
     private final UrlShorteningClient client;
 
-    public UrlShorteningService(UrlShorteningRepository repository, UrlShorteningClient client) {
+    @Autowired
+    public CreateShortUrlUseCaseImpl(UrlMappingRepository repository, UrlShorteningClient client) {
         this.repository = repository;
         this.client = client;
     }
 
+    @Override
     @Transactional
     public ShortenResponse createShortUrl(String originalUrl) {
-        try {
-            URI uri = new URI(originalUrl);
-            String scheme = uri.getScheme();
-            if (scheme == null || uri.getHost() == null ||
-                    !(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
-                log.warn("Invalid URL: missing scheme or host - {}", originalUrl);
-                throw new IllegalArgumentException("Invalid URL: missing scheme or host");
-            }
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Invalid URL: " + e.getMessage(), e);
-        }
+        validateUrl(originalUrl);
 
         try {
             Optional<UrlMapping> dbResponse = repository.findByOriginalUrl(originalUrl);
@@ -83,22 +76,6 @@ public class UrlShorteningService {
                     .build();
         } catch (DataAccessException e) {
             throw new UrlShorteningServiceException("Database error while saving data", e);
-        }
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<UrlMapping> resolveByCode(Long code) {
-        try {
-            log.info("Resolving code: {}", code);
-            Optional<UrlMapping> result = repository.findByCode(code);
-            if (result.isPresent()) {
-                log.info("Found mapping for code {}: {}", code, result.get().getOriginalUrl());
-            } else {
-                log.warn("No mapping found for code: {}", code);
-            }
-            return result;
-        } catch (DataAccessException e) {
-            throw new UrlShorteningServiceException("Database error while retrieving data", e);
         }
     }
 }

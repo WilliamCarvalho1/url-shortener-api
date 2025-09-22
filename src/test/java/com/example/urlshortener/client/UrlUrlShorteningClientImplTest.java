@@ -19,16 +19,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UrlShorteningClientTest {
+class UrlUrlShorteningClientImplTest {
 
     @Mock
     private RestTemplate restTemplate;
 
-    private UrlShorteningClient client;
+    private UrlUrlShorteningClientImpl client;
 
     @BeforeEach
     void setUp() {
-        client = new UrlShorteningClient(
+        client = new UrlUrlShorteningClientImpl(
                 "test-api-key",
                 "http://test-domain.com",
                 "test-workspace",
