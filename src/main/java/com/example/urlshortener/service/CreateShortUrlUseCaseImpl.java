@@ -6,6 +6,7 @@ import com.example.urlshortener.client.UrlShorteningClient;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.repository.UrlMappingRepository;
+import com.example.urlshortener.service.cache.CacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import static com.example.urlshortener.util.UrlValidator.validateUrl;
@@ -22,13 +24,15 @@ import static com.example.urlshortener.util.UrlValidator.validateUrl;
 public class CreateShortUrlUseCaseImpl implements CreateShortUrlUseCase {
     private static final Logger log = LoggerFactory.getLogger(CreateShortUrlUseCaseImpl.class);
 
-    private final UrlMappingRepository repository;
     private final UrlShorteningClient client;
+    private final UrlMappingRepository repository;
+    private final CacheService cacheService;
 
     @Autowired
-    public CreateShortUrlUseCaseImpl(UrlMappingRepository repository, UrlShorteningClient client) {
+    public CreateShortUrlUseCaseImpl(UrlMappingRepository repository, UrlShorteningClient client, CacheService cacheService) {
         this.repository = repository;
         this.client = client;
+        this.cacheService = cacheService;
     }
 
     @Override
@@ -69,6 +73,8 @@ public class CreateShortUrlUseCaseImpl implements CreateShortUrlUseCase {
 
             repository.save(mapping);
             log.info("Short URL created and saved: {} -> {}", originalUrl, response.getShortUrl());
+
+            cacheService.set(String.valueOf(mapping.getCode()), mapping.getOriginalUrl(), Duration.ofDays(30));
 
             return ShortenResponse.builder()
                     .code(response.getId())

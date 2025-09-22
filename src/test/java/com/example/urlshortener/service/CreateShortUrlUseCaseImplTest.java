@@ -6,6 +6,7 @@ import com.example.urlshortener.client.UrlUrlShorteningClientImpl;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.repository.UrlMappingRepository;
+import com.example.urlshortener.service.cache.CacheService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,6 +35,10 @@ class CreateShortUrlUseCaseImplTest {
 
     @Mock
     private UrlMappingRepository repository;
+
+    @Mock
+    @SuppressWarnings("unused")
+    private CacheService cacheService;
 
     @Mock
     private UrlUrlShorteningClientImpl client;

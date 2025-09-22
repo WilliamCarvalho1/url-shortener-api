@@ -4,7 +4,9 @@ This repository contains an API for an URL shortener service.
 
 Key features:
 - REST API to shorten URLs and resolve them
-- Spring Boot, JPA (H2 for dev), Actuator for health/metrics
+- Spring Boot, JPA, Actuator for health/metrics
+- Redis for caching
+- OpenAPI (Swagger) docs
 - Validation and basic error handling
 - Dockerfile and docker-compose skeleton included
 
