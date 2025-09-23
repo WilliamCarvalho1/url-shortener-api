@@ -3,8 +3,8 @@ package com.example.urlshortener.controller;
 import com.example.urlshortener.api.ShortenRequest;
 import com.example.urlshortener.api.ShortenResponse;
 import com.example.urlshortener.model.UrlMapping;
-import com.example.urlshortener.service.CreateShortUrlUseCaseImpl;
-import com.example.urlshortener.service.ResolveUrlUseCaseImpl;
+import com.example.urlshortener.service.CreateShortUrlUseCase;
+import com.example.urlshortener.service.ResolveUrlUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,19 +17,19 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UrlShorteningControllerTest {
+class UrlShorteningControllerImplTest {
 
     private static final String ORIGINAL_URL = "http://example.com";
     public static final String SHORT_URL = "http://short.url/123";
     private static final Long CODE = 123L;
 
     @InjectMocks
-    private UrlShorteningController controller;
+    private UrlShorteningControllerImpl controller;
 
     @Mock
-    private CreateShortUrlUseCaseImpl createShortUrlUseCase;
+    private CreateShortUrlUseCase createShortUrlUseCase;
     @Mock
-    private ResolveUrlUseCaseImpl resolveUrlUseCase;
+    private ResolveUrlUseCase resolveUrlUseCase;
 
     @Test
     void createSuccess() {
