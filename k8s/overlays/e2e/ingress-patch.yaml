@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: url-shortener
+spec:
+  rules:
+    - host: url-shortener-e2e.example.com
+  tls:
+    - hosts:
+        - url-shortener-e2e.example.com
+      secretName: url-shortener-e2e-tls

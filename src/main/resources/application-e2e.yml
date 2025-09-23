@@ -1,0 +1,40 @@
+spring:
+  profiles: e2e
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres-e2e:5432/url_shortener}
+    username: ${DB_USER:}
+    password: ${DB_PASSWORD:}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis-e2e}
+      port: ${REDIS_PORT:6379}
+url-shortener:
+  provider:
+    api-url: ${URL_SHORTENER_API_URL:https://api.e2e-shortener.example}
+    api-key: ${URL_SHORTENER_API_KEY:}
+  cache:
+    namespace: url-shortener-e2e
+    ttl-seconds: 86400
+resilience4j:
+  retry:
+    instances:
+      shortenerClient:
+        max-attempts: 3
+        wait-duration: 500ms
+  circuitbreaker:
+    instances:
+      shortenerClient:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+logging:
+  level:
+    root: INFO
