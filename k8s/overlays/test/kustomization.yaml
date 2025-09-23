@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: url-shortener-test
+
+resources:
+  - ../../base
+
+patches:
+  - path: hpa-patch.yaml
+    target:
+      kind: HorizontalPodAutoscaler
+  - path: ingress-patch.yaml
+    target:
+      kind: Ingress
+
+# Uncomment if you need a test-specific secret
+# secretGenerator:
+#   - name: url-shortener-secret
+#     files:
+#       - secret.yaml

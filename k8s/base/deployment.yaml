@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: url-shortener
-          image: "{{ .values.image.repository }}:{{ .values.image.tag }}"
+          image: my-repo/url-shortener:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -28,7 +28,7 @@ spec:
                 name: url-shortener-config
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: "{{ .values.profile }}"
+              value: prod
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -45,11 +45,11 @@ spec:
             failureThreshold: 3
           resources:
             requests:
-              cpu: "{{ .values.resources.requests.cpu }}"
-              memory: "{{ .values.resources.requests.memory }}"
+              cpu: 200m
+              memory: 256Mi
             limits:
-              cpu: "{{ .values.resources.limits.cpu }}"
-              memory: "{{ .values.resources.limits.memory }}"
-          readinessGates: []
+              cpu: 1000m
+              memory: 1Gi
+      readinessGates: []
       imagePullSecrets:
-        - name: "{{ .values.image.pullSecret | default "registry-secret" }}"
+        - name: registry-secret
