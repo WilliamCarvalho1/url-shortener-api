@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/url_shortener
+    driverClassName: org.postgresql.Driver
+    username: admin
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+server:
+  port: 8080
+
+url-shortener:
+  apiKey: Uco40QBZmFi/pUpCZy9/oQ==
+  domain: https://app.linklyhq.com
+  workspaceId: 320574
+
+resilience4j:
+  retry:
+    instances:
+      externalShortener:
+        max-attempts: 3
+        wait-duration: 500ms
+  circuitbreaker:
+    instances:
+      externalShortener:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

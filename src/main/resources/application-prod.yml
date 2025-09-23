@@ -16,7 +16,7 @@ url-shortener:
     api-url: ${URL_SHORTENER_API_URL}
     api-key: ${URL_SHORTENER_API_KEY}
   cache:
-    namespace: ${CACHE_NAMESPACE:urlshortener}
+    namespace: ${CACHE_NAMESPACE:}
     ttl-seconds: ${CACHE_TTL_SECONDS:2592000}
 resilience4j:
   retry:
