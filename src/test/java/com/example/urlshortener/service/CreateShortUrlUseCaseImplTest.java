@@ -7,7 +7,7 @@ import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.cache.UrlMappingCachePort;
 import com.example.urlshortener.service.db.UrlMappingFinderImpl;
 import com.example.urlshortener.service.db.UrlMappingPersister;
-import com.example.urlshortener.service.external.ExternalShorteningServiceImpl;
+import com.example.urlshortener.service.external.ExternalShorteningService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ class CreateShortUrlUseCaseImplTest {
     @Mock
     UrlMappingFinderImpl finder;
     @Mock
-    ExternalShorteningServiceImpl externalService;
+    ExternalShorteningService externalService;
     @Mock
     UrlMappingPersister persister;
 
