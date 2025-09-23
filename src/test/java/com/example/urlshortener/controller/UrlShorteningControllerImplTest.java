@@ -5,9 +5,9 @@ import com.example.urlshortener.api.ShortenResponse;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.CreateShortUrlUseCase;
 import com.example.urlshortener.service.ResolveUrlUseCase;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +23,17 @@ class UrlShorteningControllerImplTest {
     public static final String SHORT_URL = "http://short.url/123";
     private static final Long CODE = 123L;
 
-    @InjectMocks
-    private UrlShorteningControllerImpl controller;
+    private UrlShorteningController controller;
 
     @Mock
     private CreateShortUrlUseCase createShortUrlUseCase;
     @Mock
     private ResolveUrlUseCase resolveUrlUseCase;
+
+    @BeforeEach
+    void setUp() {
+        controller = new UrlShorteningControllerImpl(resolveUrlUseCase, createShortUrlUseCase);
+    }
 
     @Test
     void createSuccess() {
@@ -72,5 +76,4 @@ class UrlShorteningControllerImplTest {
         assertEquals(404, response.getStatusCode().value());
         assertNull(response.getBody());
     }
-
 }
