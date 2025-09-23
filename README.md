@@ -24,3 +24,6 @@ http://localhost:8080/swagger-ui.html
 
 ## Access Health endpoint
 http://localhost:8080/actuator/health
+
+### k8s/base/secret.yaml
+This file is not meant to be committed in a real project
