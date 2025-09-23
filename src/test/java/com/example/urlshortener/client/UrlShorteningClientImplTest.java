@@ -21,10 +21,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UrlShorteningClientImplTest {
 
+    private UrlShorteningClient client;
+
     @Mock
     private RestTemplate restTemplate;
-
-    private UrlShorteningClientImpl client;
 
     @BeforeEach
     void setUp() {

@@ -5,13 +5,12 @@ import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.cache.UrlMappingCachePort;
-import com.example.urlshortener.service.db.UrlMappingFinderImpl;
+import com.example.urlshortener.service.db.UrlMappingFinder;
 import com.example.urlshortener.service.db.UrlMappingPersister;
 import com.example.urlshortener.service.external.ExternalShorteningService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
@@ -28,23 +27,24 @@ class CreateShortUrlUseCaseImplTest {
     private static final String SHORT_URL = "http://short.url/abc";
     private static final Long CODE = 123L;
 
-    @Mock
-    UrlMappingCachePort cachePort;
-    @Mock
-    UrlMappingFinderImpl finder;
-    @Mock
-    ExternalShorteningService externalService;
-    @Mock
-    UrlMappingPersister persister;
+    private CreateShortUrlUseCase useCase;
 
-    @InjectMocks
-    CreateShortUrlUseCaseImpl useCase;
+    @Mock
+    private UrlMappingCachePort cachePort;
+    @Mock
+    private UrlMappingFinder finder;
+    @Mock
+    private ExternalShorteningService externalService;
+    @Mock
+    private UrlMappingPersister persister;
 
-    UrlMapping mapping;
-    LinkResponse linkResponse;
+    private UrlMapping mapping;
+    private LinkResponse linkResponse;
 
     @BeforeEach
     void setUp() {
+        useCase = new CreateShortUrlUseCaseImpl(cachePort, finder, externalService, persister);
+
         mapping = UrlMapping.builder()
                 .code(CODE)
                 .originalUrl(ORIGINAL_URL)

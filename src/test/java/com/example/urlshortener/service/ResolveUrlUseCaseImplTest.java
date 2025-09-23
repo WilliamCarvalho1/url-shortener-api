@@ -7,7 +7,6 @@ import com.example.urlshortener.service.db.UrlMappingFinder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
@@ -24,14 +23,13 @@ class ResolveUrlUseCaseImplTest {
     public static final String SHORT_URL = "http://short.url/123";
     private static final Long CODE = 123L;
 
+    private ResolveUrlUseCase resolveUrlUseCase;
+
     @Mock
     private UrlMappingFinder finder;
 
     @Mock
-    UrlMappingCachePort cachePort;
-
-    @InjectMocks
-    private ResolveUrlUseCaseImpl resolveUrlUseCase;
+    private UrlMappingCachePort cachePort;
 
     @BeforeEach
     void setUp() {
