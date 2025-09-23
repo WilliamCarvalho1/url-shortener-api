@@ -5,9 +5,9 @@ import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.cache.UrlMappingCachePort;
-import com.example.urlshortener.service.db.UrlMappingFinderImpl;
+import com.example.urlshortener.service.db.UrlMappingFinder;
 import com.example.urlshortener.service.db.UrlMappingPersister;
-import com.example.urlshortener.service.external.ExternalShorteningServiceImpl;
+import com.example.urlshortener.service.external.ExternalShorteningService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +24,14 @@ public class CreateShortUrlUseCaseImpl implements CreateShortUrlUseCase {
     private static final Logger log = LoggerFactory.getLogger(CreateShortUrlUseCaseImpl.class);
 
     private final UrlMappingCachePort urlMappingCachePort;
-    private final UrlMappingFinderImpl finder;
-    private final ExternalShorteningServiceImpl externalService;
+    private final UrlMappingFinder finder;
+    private final ExternalShorteningService externalService;
     private final UrlMappingPersister persister;
 
     @Autowired
     public CreateShortUrlUseCaseImpl(UrlMappingCachePort urlMappingCachePort,
-                                     UrlMappingFinderImpl finder,
-                                     ExternalShorteningServiceImpl externalService,
+                                     UrlMappingFinder finder,
+                                     ExternalShorteningService externalService,
                                      UrlMappingPersister persister
     ) {
 
