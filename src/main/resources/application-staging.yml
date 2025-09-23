@@ -1,0 +1,28 @@
+spring:
+  profiles: staging
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres-staging:5432/url_shortener}
+    username: ${DB_USER:urlshortener}
+    password: ${DB_PASSWORD:}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis-staging}
+      port: ${REDIS_PORT:6379}
+url-shortener:
+  provider:
+    api-url: ${URL_SHORTENER_API_URL:https://api.staging-shortener.example}
+    api-key: ${URL_SHORTENER_API_KEY:}
+  cache:
+    namespace: url-shortener-staging
+    ttl-seconds: 86400
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+logging:
+  level:
+    root: INFO

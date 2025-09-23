@@ -1,0 +1,41 @@
+profile: "prod"
+replicaCount: 3
+image:
+  repository: your-registry/url-shortener
+  tag: "1.0.0"
+  pullSecret: ""
+resources:
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+service:
+  type: ClusterIP
+  port: 80
+env:
+  # non-sensitive defaults go here; secrets should come from k8s Secret
+  CACHE_NAMESPACE: url-shortener
+  CACHE_TTL_SECONDS: 2592000 # 30 days
+  SERVER_PORT: 8080
+database:
+  url: jdbc:postgresql://postgres.example.svc.cluster.local:5432/url_shortener
+  user: urlshortener
+redis:
+  host: redis-master
+  port: 6379
+externalProvider:
+  apiUrl: https://api.external-shortener.example
+  # DO NOT store keys here; use kubernetes secret or external secret manager
+  apiKey: ""
+livenessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+readinessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10

@@ -1,0 +1,25 @@
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/url_shortener_dev
+    username: admin
+    password: "password"
+  data:
+    redis:
+      host: localhost
+      port: 6379
+url-shortener:
+  provider:
+    api-url: https://api.sandbox-shortener.example
+    api-key: "dev-placeholder-key"
+  cache:
+    namespace: url-shortener-dev
+    ttl-seconds: 3600
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+logging:
+  level:
+    root: INFO
