@@ -10,8 +10,8 @@ spring:
       port: ${REDIS_PORT:6379}
 url-shortener:
   provider:
-    api-url: ${URL_SHORTENER_API_URL:https://api.e2e-shortener.example}
-    api-key: ${URL_SHORTENER_API_KEY:}
+    api-url: ${URL_SHORTENER_API_URL}
+    api-key: ${URL_SHORTENER_API_KEY}
   cache:
     namespace: url-shortener-e2e
     ttl-seconds: 86400
