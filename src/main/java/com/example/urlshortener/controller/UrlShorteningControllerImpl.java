@@ -2,6 +2,7 @@ package com.example.urlshortener.controller;
 
 import com.example.urlshortener.api.ShortenRequest;
 import com.example.urlshortener.api.ShortenResponse;
+import com.example.urlshortener.api.UrlResponse;
 import com.example.urlshortener.service.CreateShortUrlUseCase;
 import com.example.urlshortener.service.ResolveUrlUseCase;
 import jakarta.validation.Valid;
@@ -33,24 +34,19 @@ public class UrlShorteningControllerImpl implements UrlShorteningController {
 
         log.info("Received request to shorten URL: {}", request.getUrl());
         ShortenResponse mapping = createShortUrlUseCase.createShortUrl(request.getUrl());
-        log.info("Short URL created: code={}, shortUrl={}", mapping.getCode(), mapping.getShortUrl());
+        log.info("Short URL created: code = {}, shortUrl = {}", mapping.getCode(), mapping.getShortUrl());
 
         return ResponseEntity.ok(mapping);
     }
 
     @Override
     @GetMapping("/resolve/{code}")
-    public ResponseEntity<String> resolve(@NotNull @PathVariable("code") Long code) {
+    public ResponseEntity<UrlResponse> resolve(@NotNull @PathVariable("code") Long code) {
         log.info("Received request to resolve code: {}", code);
-        return resolveUrlUseCase.resolveByCode(code)
-                .map(m -> {
-                    log.info("Original URL found for code {}: {}", code, m.getOriginalUrl());
-                    return ResponseEntity.ok(m.getOriginalUrl());
-                })
-                .orElseGet(() -> {
-                    log.warn("No URL found for code: {}", code);
-                    return ResponseEntity.notFound().build();
-                });
+        UrlResponse response = resolveUrlUseCase.resolveByCode(code);
+        log.info("Original URL resolved: {}", response.getOriginalUrl());
+
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.urlshortener.service;
 
+import com.example.urlshortener.api.UrlResponse;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.cache.UrlMappingCachePort;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+
+import static com.example.urlshortener.util.UrlMappingMapper.urlMappingToUrlResponse;
 
 @Service
 public class ResolveUrlUseCaseImpl implements ResolveUrlUseCase {
@@ -26,23 +29,23 @@ public class ResolveUrlUseCaseImpl implements ResolveUrlUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UrlMapping> resolveByCode(Long code) {
-
+    public UrlResponse resolveByCode(Long code) {
         try {
             Optional<UrlMapping> cached = cachePort.get(code);
             if (cached.isPresent()) {
                 log.info("Cache hit for code {} -> {}", code, cached.get().getOriginalUrl());
-                return cached;
+                return urlMappingToUrlResponse(cached.get());
             }
 
             Optional<UrlMapping> dbResult = finder.findExistingMappingByCode(code);
-            dbResult.ifPresent(mapping -> {
-                log.info("Cache miss, storing in cache: {} -> {}", code, mapping.getOriginalUrl());
-                cachePort.cache(mapping);
-            });
-            return dbResult;
+            if (dbResult.isPresent()) {
+                log.info("Cache miss, storing in cache: {} -> {}", code, dbResult.get().getOriginalUrl());
+                cachePort.cache(dbResult.get());
+                return urlMappingToUrlResponse(dbResult.get());
+            }
         } catch (DataAccessException ex) {
             throw new UrlShorteningServiceException("Database error: " + ex.getMessage(), ex);
         }
+        throw new UrlShorteningServiceException("URL mapping not found for code: " + code);
     }
 }

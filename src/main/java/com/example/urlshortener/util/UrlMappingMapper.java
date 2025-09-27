@@ -1,6 +1,7 @@
 package com.example.urlshortener.util;
 
 import com.example.urlshortener.api.ShortenResponse;
+import com.example.urlshortener.api.UrlResponse;
 import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.model.UrlMapping;
 
@@ -30,6 +31,10 @@ public class UrlMappingMapper {
                 .code(urlMapping.getCode())
                 .shortUrl(urlMapping.getShortUrl())
                 .build();
+    }
+
+    public static UrlResponse urlMappingToUrlResponse(UrlMapping urlMapping) {
+        return new UrlResponse(urlMapping.getOriginalUrl());
     }
 
 }

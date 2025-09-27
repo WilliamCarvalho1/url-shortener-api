@@ -1,9 +1,7 @@
 package com.example.urlshortener.service;
 
-import com.example.urlshortener.model.UrlMapping;
-
-import java.util.Optional;
+import com.example.urlshortener.api.UrlResponse;
 
 public interface ResolveUrlUseCase {
-    Optional<UrlMapping> resolveByCode(Long code);
+    UrlResponse resolveByCode(Long code);
 }

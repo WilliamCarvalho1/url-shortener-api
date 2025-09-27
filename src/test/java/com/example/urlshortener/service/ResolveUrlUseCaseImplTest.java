@@ -1,5 +1,6 @@
 package com.example.urlshortener.service;
 
+import com.example.urlshortener.api.UrlResponse;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.cache.UrlMappingCachePort;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.*;
 class ResolveUrlUseCaseImplTest {
 
     private static final String ORIGINAL_URL = "http://example.com";
-    public static final String SHORT_URL = "http://short.url/123";
+    private static final String SHORT_URL = "http://short.url/123";
     private static final Long CODE = 123L;
 
     private ResolveUrlUseCase resolveUrlUseCase;
@@ -44,13 +45,13 @@ class ResolveUrlUseCaseImplTest {
                 .shortUrl(SHORT_URL)
                 .build();
 
-        when(cachePort.get(CODE)).thenReturn(Optional.of(mapping));
+        when(cachePort.get(CODE))
+                .thenReturn(Optional.of(mapping));
 
-        Optional<UrlMapping> result = resolveUrlUseCase.resolveByCode(CODE);
+        UrlResponse result = resolveUrlUseCase.resolveByCode(CODE);
 
-        assertTrue(result.isPresent());
-        assertEquals(CODE, result.get().getCode());
-        assertEquals(ORIGINAL_URL, result.get().getOriginalUrl());
+        assertNotNull(result);
+        assertEquals(ORIGINAL_URL, result.getOriginalUrl());
         verify(cachePort).get(CODE);
         verify(finder, never()).findExistingMappingByCode(anyLong());
     }
@@ -67,15 +68,13 @@ class ResolveUrlUseCaseImplTest {
                 .build();
         when(finder.findExistingMappingByCode(CODE))
                 .thenReturn(Optional.of(mapping));
-        doNothing().when(cachePort)
-                .cache(mapping);
+        doNothing()
+                .when(cachePort).cache(mapping);
 
-        Optional<UrlMapping> result = resolveUrlUseCase.resolveByCode(CODE);
+        UrlResponse result = resolveUrlUseCase.resolveByCode(CODE);
 
-        assertTrue(result.isPresent());
-        assertEquals(CODE, result.get().getCode());
-        assertEquals(SHORT_URL, result.get().getShortUrl());
-        assertEquals(ORIGINAL_URL, result.get().getOriginalUrl());
+        assertNotNull(result);
+        assertEquals(ORIGINAL_URL, result.getOriginalUrl());
         verify(cachePort).get(CODE);
         verify(finder).findExistingMappingByCode(CODE);
         verify(cachePort).cache(mapping);
@@ -88,12 +87,16 @@ class ResolveUrlUseCaseImplTest {
         when(finder.findExistingMappingByCode(CODE))
                 .thenReturn(Optional.empty());
 
-        Optional<UrlMapping> result = resolveUrlUseCase.resolveByCode(CODE);
+        UrlShorteningServiceException ex = assertThrows(
+                UrlShorteningServiceException.class,
+                () -> resolveUrlUseCase.resolveByCode(CODE)
+        );
+        assertTrue(ex.getMessage().contains("not found"));
 
-        assertFalse(result.isPresent());
         verify(cachePort).get(CODE);
         verify(finder).findExistingMappingByCode(CODE);
         verify(cachePort, never()).cache(any());
+        verifyNoMoreInteractions(cachePort, finder);
     }
 
     @Test
@@ -108,6 +111,7 @@ class ResolveUrlUseCaseImplTest {
                 UrlShorteningServiceException.class,
                 () -> resolveUrlUseCase.resolveByCode(CODE)
         );
+
         assertTrue(ex.getMessage().contains("Database error"));
         verify(cachePort).get(CODE);
         verify(finder).findExistingMappingByCode(CODE);
