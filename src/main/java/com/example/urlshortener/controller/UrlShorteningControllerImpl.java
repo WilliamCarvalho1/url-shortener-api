@@ -35,7 +35,7 @@ public class UrlShorteningControllerImpl implements UrlShorteningController {
         ShortenResponse mapping = createShortUrlUseCase.createShortUrl(request.getUrl());
         log.info("Short URL created: code={}, shortUrl={}", mapping.getCode(), mapping.getShortUrl());
 
-        return ResponseEntity.ok(new ShortenResponse(mapping.getCode(), mapping.getShortUrl()));
+        return ResponseEntity.ok(mapping);
     }
 
     @Override
