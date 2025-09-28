@@ -1,6 +1,7 @@
 package com.example.urlshortener.service;
 
 import com.example.urlshortener.api.UrlResponse;
+import com.example.urlshortener.exception.UrlNotFoundException;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.cache.UrlMappingCachePort;
@@ -46,6 +47,6 @@ public class ResolveUrlUseCaseImpl implements ResolveUrlUseCase {
         } catch (DataAccessException ex) {
             throw new UrlShorteningServiceException("Database error: " + ex.getMessage(), ex);
         }
-        throw new UrlShorteningServiceException("URL mapping not found for code: " + code);
+        throw new UrlNotFoundException(code.toString());
     }
 }

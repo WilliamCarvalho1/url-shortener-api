@@ -1,6 +1,7 @@
 package com.example.urlshortener.service;
 
 import com.example.urlshortener.api.UrlResponse;
+import com.example.urlshortener.exception.UrlNotFoundException;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
 import com.example.urlshortener.service.cache.UrlMappingCachePort;
@@ -87,11 +88,12 @@ class ResolveUrlUseCaseImplTest {
         when(finder.findExistingMappingByCode(CODE))
                 .thenReturn(Optional.empty());
 
-        UrlShorteningServiceException ex = assertThrows(
-                UrlShorteningServiceException.class,
+        UrlNotFoundException ex = assertThrows(
+                UrlNotFoundException.class,
                 () -> resolveUrlUseCase.resolveByCode(CODE)
         );
-        assertTrue(ex.getMessage().contains("not found"));
+
+        assertEquals(CODE.toString(), ex.getMessage());
 
         verify(cachePort).get(CODE);
         verify(finder).findExistingMappingByCode(CODE);

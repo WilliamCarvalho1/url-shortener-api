@@ -1,5 +1,6 @@
 package com.example.urlshortener.controller;
 
+import com.example.urlshortener.exception.UrlNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,5 +29,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleOtherExceptions(Exception ex) {
         log.error("Internal server error", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+    }
+
+    @ExceptionHandler(UrlNotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException(Exception ex) {
+        log.warn("URL mapping not found for code: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("URL mapping not found for code: " + ex.getMessage());
     }
 }
