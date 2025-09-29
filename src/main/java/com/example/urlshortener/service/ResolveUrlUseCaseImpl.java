@@ -40,11 +40,11 @@ public class ResolveUrlUseCaseImpl implements ResolveUrlUseCase {
                 return urlMappingToUrlResponse(cached.get());
             }
 
-            Optional<UrlMapping> dbResult = finder.findExistingMappingByCode(code);
-            if (dbResult.isPresent()) {
-                log.info("Cache miss, storing in cache: {} -> {}", code, dbResult.get().getOriginalUrl());
-                cachePort.save(dbResult.get());
-                return urlMappingToUrlResponse(dbResult.get());
+            Optional<UrlMapping> dbStored = finder.findExistingMappingByCode(code);
+            if (dbStored.isPresent()) {
+                log.info("Cache miss, storing in cache: {} -> {}", code, dbStored.get().getOriginalUrl());
+                cachePort.save(dbStored.get());
+                return urlMappingToUrlResponse(dbStored.get());
             }
         } catch (DataAccessException ex) {
             throw new UrlShorteningServiceException("Database error: " + ex.getMessage(), ex);

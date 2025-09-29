@@ -1,18 +1,27 @@
 package com.example.urlshortener.util;
 
+import com.example.urlshortener.model.UrlMapping;
+
 public class RedisResponseMapper {
 
     private RedisResponseMapper() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
-    public static Long getCodeFromRedisResponse(String input) {
-        int idx = input.indexOf('_');
-        return Long.parseLong(input.substring(0, idx));
+    private static final String SEP = "_";
+
+    public static String concatenateCodeAndShortUrl(UrlMapping mapping) {
+        return mapping.getCode() + SEP + mapping.getShortUrl();
     }
 
-    public static String getShortUrlFromRedisResponse(String input) {
-        int idx = input.indexOf('_');
-        return input.substring(idx + 1);
+    public static UrlMapping deconcatenateCodeAndShortUrl(String stored) {
+        int idx = stored.indexOf(SEP);
+        Long code = Long.valueOf(stored.substring(0, idx));
+        String shortUrl = stored.substring(idx + 1);
+
+        return UrlMapping.builder()
+                .code(code)
+                .shortUrl(shortUrl)
+                .build();
     }
 }
