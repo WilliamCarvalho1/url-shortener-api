@@ -1,6 +1,6 @@
 package com.example.urlshortener.service;
 
-import com.example.urlshortener.api.ShortenResponse;
+import com.example.urlshortener.dto.ShortenResponse;
 import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
@@ -66,7 +66,7 @@ class CreateShortUrlUseCaseImplTest {
 
         assertEquals(SHORT_URL, response.getShortUrl());
         verify(finder).findExistingMappingByUrl(ORIGINAL_URL);
-        verifyNoInteractions(externalService, persister, cachePort);
+        verifyNoInteractions(externalService, persister);
     }
 
     @Test
@@ -84,7 +84,7 @@ class CreateShortUrlUseCaseImplTest {
         verify(finder).findExistingMappingByUrl(ORIGINAL_URL);
         verify(externalService).callExternalShortener(ORIGINAL_URL);
         verify(persister).saveFromResponse(any(UrlMapping.class));
-        verify(cachePort).cache(mapping);
+        verify(cachePort).save(mapping);
     }
 
     @Test

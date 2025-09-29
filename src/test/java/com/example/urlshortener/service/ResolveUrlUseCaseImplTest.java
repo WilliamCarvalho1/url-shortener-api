@@ -1,6 +1,6 @@
 package com.example.urlshortener.service;
 
-import com.example.urlshortener.api.UrlResponse;
+import com.example.urlshortener.dto.UrlResponse;
 import com.example.urlshortener.exception.UrlNotFoundException;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
@@ -46,20 +46,20 @@ class ResolveUrlUseCaseImplTest {
                 .shortUrl(SHORT_URL)
                 .build();
 
-        when(cachePort.get(CODE))
+        when(cachePort.findByCode(CODE))
                 .thenReturn(Optional.of(mapping));
 
         UrlResponse result = resolveUrlUseCase.resolveByCode(CODE);
 
         assertNotNull(result);
         assertEquals(ORIGINAL_URL, result.getOriginalUrl());
-        verify(cachePort).get(CODE);
+        verify(cachePort).findByCode(CODE);
         verify(finder, never()).findExistingMappingByCode(anyLong());
     }
 
     @Test
     void resolveByCodeDbResponse() {
-        when(cachePort.get(CODE))
+        when(cachePort.findByCode(CODE))
                 .thenReturn(Optional.empty());
 
         UrlMapping mapping = UrlMapping.builder()
@@ -70,20 +70,20 @@ class ResolveUrlUseCaseImplTest {
         when(finder.findExistingMappingByCode(CODE))
                 .thenReturn(Optional.of(mapping));
         doNothing()
-                .when(cachePort).cache(mapping);
+                .when(cachePort).save(mapping);
 
         UrlResponse result = resolveUrlUseCase.resolveByCode(CODE);
 
         assertNotNull(result);
         assertEquals(ORIGINAL_URL, result.getOriginalUrl());
-        verify(cachePort).get(CODE);
+        verify(cachePort).findByCode(CODE);
         verify(finder).findExistingMappingByCode(CODE);
-        verify(cachePort).cache(mapping);
+        verify(cachePort).save(mapping);
     }
 
     @Test
     void resolveByCodeNotFound() {
-        when(cachePort.get(CODE))
+        when(cachePort.findByCode(CODE))
                 .thenReturn(Optional.empty());
         when(finder.findExistingMappingByCode(CODE))
                 .thenReturn(Optional.empty());
@@ -95,15 +95,15 @@ class ResolveUrlUseCaseImplTest {
 
         assertEquals(CODE.toString(), ex.getMessage());
 
-        verify(cachePort).get(CODE);
+        verify(cachePort).findByCode(CODE);
         verify(finder).findExistingMappingByCode(CODE);
-        verify(cachePort, never()).cache(any());
+        verify(cachePort, never()).save(any());
         verifyNoMoreInteractions(cachePort, finder);
     }
 
     @Test
     void resolveByCodeThrowsUrlShorteningServiceException() {
-        when(cachePort.get(CODE))
+        when(cachePort.findByCode(CODE))
                 .thenReturn(Optional.empty());
         when(finder.findExistingMappingByCode(CODE))
                 .thenThrow(new DataAccessException("DB error") {
@@ -115,7 +115,7 @@ class ResolveUrlUseCaseImplTest {
         );
 
         assertTrue(ex.getMessage().contains("Database error"));
-        verify(cachePort).get(CODE);
+        verify(cachePort).findByCode(CODE);
         verify(finder).findExistingMappingByCode(CODE);
     }
 }

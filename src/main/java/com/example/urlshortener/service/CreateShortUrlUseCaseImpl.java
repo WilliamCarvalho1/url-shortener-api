@@ -1,6 +1,6 @@
 package com.example.urlshortener.service;
 
-import com.example.urlshortener.api.ShortenResponse;
+import com.example.urlshortener.dto.ShortenResponse;
 import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
@@ -46,10 +46,15 @@ public class CreateShortUrlUseCaseImpl implements CreateShortUrlUseCase {
     public ShortenResponse createShortUrl(String originalUrl) {
         validateUrl(originalUrl);
 
-        Optional<UrlMapping> existing = finder.findExistingMappingByUrl(originalUrl);
-        if (existing.isPresent()) {
-            log.info("URL already shortened: {} -> {}", originalUrl, existing.get().getShortUrl());
-            return urlMappingToShortenResponseMapper(existing.get());
+        Optional<UrlMapping> cached = urlMappingCachePort.findByOriginalUrl(originalUrl);
+        if (cached.isPresent()) {
+            return urlMappingToShortenResponseMapper(cached.get());
+        }
+
+        Optional<UrlMapping> dbStored = finder.findExistingMappingByUrl(originalUrl);
+        if (dbStored.isPresent()) {
+            log.info("URL already shortened: {} -> {}", originalUrl, dbStored.get().getShortUrl());
+            return urlMappingToShortenResponseMapper(dbStored.get());
         }
 
         LinkResponse response = externalService.callExternalShortener(originalUrl);
@@ -58,7 +63,7 @@ public class CreateShortUrlUseCaseImpl implements CreateShortUrlUseCase {
         }
 
         UrlMapping urlMapping = persister.saveFromResponse(linkResponseToUrlMappingMapper(response));
-        urlMappingCachePort.cache(urlMapping);
+        urlMappingCachePort.save(urlMapping);
 
         return linkResponseToShortenResponseMapper(response);
     }

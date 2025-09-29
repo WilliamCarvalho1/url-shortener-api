@@ -1,8 +1,8 @@
 package com.example.urlshortener.controller;
 
-import com.example.urlshortener.api.ShortenRequest;
-import com.example.urlshortener.api.ShortenResponse;
-import com.example.urlshortener.api.UrlResponse;
+import com.example.urlshortener.dto.ShortenRequest;
+import com.example.urlshortener.dto.ShortenResponse;
+import com.example.urlshortener.dto.UrlResponse;
 import com.example.urlshortener.service.CreateShortUrlUseCase;
 import com.example.urlshortener.service.ResolveUrlUseCase;
 import org.junit.jupiter.api.BeforeEach;
