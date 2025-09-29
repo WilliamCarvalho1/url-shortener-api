@@ -4,7 +4,7 @@ import com.example.urlshortener.dto.ShortenResponse;
 import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
-import com.example.urlshortener.service.cache.UrlMappingCachePort;
+import com.example.urlshortener.cache.UrlMappingCachePort;
 import com.example.urlshortener.service.db.UrlMappingFinder;
 import com.example.urlshortener.service.db.UrlMappingPersister;
 import com.example.urlshortener.service.external.ExternalShorteningService;

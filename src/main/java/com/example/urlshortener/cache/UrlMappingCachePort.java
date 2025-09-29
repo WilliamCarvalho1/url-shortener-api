@@ -1,4 +1,4 @@
-package com.example.urlshortener.service.cache;
+package com.example.urlshortener.cache;
 
 import com.example.urlshortener.model.UrlMapping;
 

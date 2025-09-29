@@ -1,5 +1,7 @@
 package com.example.urlshortener.service.cache;
 
+import com.example.urlshortener.cache.RedisUrlMappingCacheAdapter;
+import com.example.urlshortener.cache.UrlMappingCachePort;
 import com.example.urlshortener.model.UrlMapping;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -4,7 +4,7 @@ import com.example.urlshortener.dto.UrlResponse;
 import com.example.urlshortener.exception.UrlNotFoundException;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;
-import com.example.urlshortener.service.cache.UrlMappingCachePort;
+import com.example.urlshortener.cache.UrlMappingCachePort;
 import com.example.urlshortener.service.db.UrlMappingFinder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
