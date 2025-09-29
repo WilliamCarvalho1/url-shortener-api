@@ -46,6 +46,11 @@ public class CreateShortUrlUseCaseImpl implements CreateShortUrlUseCase {
     public ShortenResponse createShortUrl(String originalUrl) {
         validateUrl(originalUrl);
 
+        Optional<UrlMapping> cachedMapping = urlMappingCachePort.findByOriginalUrl(originalUrl);
+        if (cachedMapping.isPresent()) {
+            return urlMappingToShortenResponseMapper(cachedMapping.get());
+        }
+
         Optional<UrlMapping> existing = finder.findExistingMappingByUrl(originalUrl);
         if (existing.isPresent()) {
             log.info("URL already shortened: {} -> {}", originalUrl, existing.get().getShortUrl());
@@ -58,7 +63,7 @@ public class CreateShortUrlUseCaseImpl implements CreateShortUrlUseCase {
         }
 
         UrlMapping urlMapping = persister.saveFromResponse(linkResponseToUrlMappingMapper(response));
-        urlMappingCachePort.cache(urlMapping);
+        urlMappingCachePort.save(urlMapping);
 
         return linkResponseToShortenResponseMapper(response);
     }

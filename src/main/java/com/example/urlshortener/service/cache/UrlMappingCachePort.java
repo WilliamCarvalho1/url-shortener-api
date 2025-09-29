@@ -6,7 +6,9 @@ import java.util.Optional;
 
 public interface UrlMappingCachePort {
 
-    void cache(UrlMapping mapping);
+    Optional<UrlMapping> findByCode(Long code);
 
-    Optional<UrlMapping> get(Long code);
+    Optional<UrlMapping> findByOriginalUrl(String originalUrl);
+
+    void save(UrlMapping urlMapping);
 }

@@ -8,6 +8,7 @@ import com.example.urlshortener.service.cache.UrlMappingCachePort;
 import com.example.urlshortener.service.db.UrlMappingFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class ResolveUrlUseCaseImpl implements ResolveUrlUseCase {
     private final UrlMappingCachePort cachePort;
     private final UrlMappingFinder finder;
 
+    @Autowired
     public ResolveUrlUseCaseImpl(UrlMappingCachePort cachePort, UrlMappingFinder finder) {
         this.cachePort = cachePort;
         this.finder = finder;
@@ -32,7 +34,7 @@ public class ResolveUrlUseCaseImpl implements ResolveUrlUseCase {
     @Transactional(readOnly = true)
     public UrlResponse resolveByCode(Long code) {
         try {
-            Optional<UrlMapping> cached = cachePort.get(code);
+            Optional<UrlMapping> cached = cachePort.findByCode(code);
             if (cached.isPresent()) {
                 log.info("Cache hit for code {} -> {}", code, cached.get().getOriginalUrl());
                 return urlMappingToUrlResponse(cached.get());
@@ -41,7 +43,7 @@ public class ResolveUrlUseCaseImpl implements ResolveUrlUseCase {
             Optional<UrlMapping> dbResult = finder.findExistingMappingByCode(code);
             if (dbResult.isPresent()) {
                 log.info("Cache miss, storing in cache: {} -> {}", code, dbResult.get().getOriginalUrl());
-                cachePort.cache(dbResult.get());
+                cachePort.save(dbResult.get());
                 return urlMappingToUrlResponse(dbResult.get());
             }
         } catch (DataAccessException ex) {
