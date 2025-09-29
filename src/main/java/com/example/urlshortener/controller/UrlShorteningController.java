@@ -1,8 +1,8 @@
 package com.example.urlshortener.controller;
 
-import com.example.urlshortener.api.ShortenRequest;
-import com.example.urlshortener.api.ShortenResponse;
-import com.example.urlshortener.api.UrlResponse;
+import com.example.urlshortener.dto.ShortenRequest;
+import com.example.urlshortener.dto.ShortenResponse;
+import com.example.urlshortener.dto.UrlResponse;
 import org.springframework.http.ResponseEntity;
 
 public interface UrlShorteningController {

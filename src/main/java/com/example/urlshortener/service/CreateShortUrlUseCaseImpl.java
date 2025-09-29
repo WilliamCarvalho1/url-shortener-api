@@ -1,6 +1,6 @@
 package com.example.urlshortener.service;
 
-import com.example.urlshortener.api.ShortenResponse;
+import com.example.urlshortener.dto.ShortenResponse;
 import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.exception.UrlShorteningServiceException;
 import com.example.urlshortener.model.UrlMapping;

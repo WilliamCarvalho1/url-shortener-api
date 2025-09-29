@@ -1,6 +1,6 @@
 package com.example.urlshortener.util;
 
-import com.example.urlshortener.api.ShortenResponse;
+import com.example.urlshortener.dto.ShortenResponse;
 import com.example.urlshortener.client.LinkResponse;
 import com.example.urlshortener.model.UrlMapping;
 import org.junit.jupiter.api.Test;
